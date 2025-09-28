@@ -1,9 +1,6 @@
 import { Routes } from '@angular/router';
 
 // OJO: sin ".component"
-import { DashboardLayoutComponent }from './layout/dashboard-layout/dashboard-layout.component';
-import { HomeComponent } from './pages/home/home.component';
-import { DailymessageComponent } from './pages/dailymessage/dailymessage.component';
 import { roleGuard } from '../../core/guards/role-guard';
 
 
@@ -26,16 +23,14 @@ export const DASHBOARD_ROUTES: Routes = [
         path:'dailymessage',
         canMatch: [roleGuard],
         loadComponent: () =>
-          import('./pages/dailymessage/dailymessage.component')
-            .then(m => m.DailymessageComponent),
+          import('./pages/dailymessage/dailymessage.component'),
       },
       {
         path:'users',
         canMatch: [roleGuard],
         //data: { roles: ['admin'] },
         loadComponent: () =>
-          import('./pages/users/users.component')
-            .then(m => m.UsersComponent),
+          import('./pages/users/users.component'),
       },
 
     ],

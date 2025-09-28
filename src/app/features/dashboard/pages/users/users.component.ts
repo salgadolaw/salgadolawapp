@@ -31,7 +31,7 @@ import { map } from 'rxjs';
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
-export class UsersComponent {
+export default class UsersComponent {
   private usersSvc = inject(Users);
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);

@@ -8,9 +8,18 @@
 /* === Material + Tailwind (orden correcto) === */
 /* === Tailwind sin preflight + Material (M3) === */
 /* === Tailwind v4 SIN preflight (oficial) === */
-@use "@angular/material" as mat;
-@layer theme, base, components, utilities;
 /* importa solo theme y utilities (omitiendo preflight) */
+
+@use "@angular/material" as mat;
+
+$theme: mat.define-theme(( color: ( theme-type: light ) ));
+@include mat.core();
+:root { @include mat.all-component-themes($theme); }
+
+
+
+@layer theme, base, components, utilities;
+
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
@@ -18,12 +27,21 @@
 /*
 
 */
-$theme: mat.define-theme(( color: ( theme-type: light ) ));
-@include mat.core();
-:root { @include mat.all-component-themes($theme); }
 
 /* base */
 html, body { height: 100%; }
 body { margin: 0; }
 
 /* Custom global styles */
+
+
+/* styles.scss (global) */
+.cdk-overlay-pane.dialog-fullscreen {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  height: 90vh !important;
+  max-height: 90vh !important;
+}
+.dialog-fullscreen .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 10px; /* opcional, sin esquinas redondeadas */
+}
