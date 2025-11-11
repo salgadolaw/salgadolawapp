@@ -1,0 +1,101 @@
+
+<app-loading [loading]="loading()"/>
+<mat-card class="welcome-card">
+  <mat-card-header>
+@if(accesFormOne()){
+    <mat-card-title>Crear Contacto - Matter </mat-card-title>
+}
+  </mat-card-header>
+  <mat-card-content>
+@if(accesFormOne()){
+<mat-card class="p-4" >
+  <form [formGroup]="form" (ngSubmit)="send()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <!-- Type (siempre Person, pero queda select por si lo quieres cambiar luego) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option value="Person">Person</mat-option>
+        <mat-option value="Company">Company</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="first_name" />
+      <mat-error *ngIf="form.controls.first_name.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="last_name" />
+      <mat-error *ngIf="form.controls.last_name.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email type</mat-label>
+      <mat-select formControlName="email_name">
+        <mat-option *ngFor="let t of emailTypes" [value]="t">{{ t }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
+
+    <mat-form-field appearance="outline" class="sm:col-span-2 lg:col-span-2">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+      <mat-error *ngIf="form.controls.email.hasError('required')">Requerido</mat-error>
+      <mat-error *ngIf="form.controls.email.hasError('email')">Email inválido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone type</mat-label>
+      <mat-select formControlName="phone_name">
+        <mat-option *ngFor="let t of phoneTypes" [value]="t">{{ t }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="sm:col-span-2 lg:col-span-2">
+      <mat-label>Phone</mat-label>
+      <input matInput formControlName="phone" />
+      <mat-error *ngIf="form.controls.phone.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
+
+    <!-- Botón de acción (tamaño contenido) -->
+    <div class="flex items-center gap-2 lg:col-span-3">
+      <button mat-flat-button color="primary" [disabled]="form.invalid" type="submit" class="w-auto">Guardar</button>
+      <button mat-stroked-button type="button" class="w-auto" (click)="form.reset({ type: 'Person', email_name: 'Work', phone_name: 'Work' })">
+        Limpiar
+      </button>
+      <button mat-flat-button color="dark" (click)="close()">Cerrar</button>
+    </div>
+
+  </form>
+</mat-card>
+}
+
+
+
+
+<clio-new-matter-contact [senalFirstForm]="accesFormTwo()" [valueIdClient]="valueIdClient_()"/>
+
+</mat-card-content>
+<!--<form action="">
+
+   <mat-select >
+    <option [value]="">Seleccione</option>
+   </mat-select>
+
+
+
+
+
+    <mat-dialog-actions align="end" class="sm:col-span-2 lg:col-span-3 p-2">
+    <button mat-stroked-button (click)="close()">Cancelar</button>
+    <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="save()">
+      Guardar
+    </button>
+  </mat-dialog-actions>
+
+</form>-->

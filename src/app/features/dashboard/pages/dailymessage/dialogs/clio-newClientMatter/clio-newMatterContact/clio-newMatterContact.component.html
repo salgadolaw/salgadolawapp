@@ -1,0 +1,40 @@
+<app-loading [loading]="loading()"/>
+@if(senalFirstForm()){
+  <mat-card >
+  <h5> Creamos el Matter</h5>
+
+  <form [formGroup]="form" >
+
+
+     <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Descripción Matter</mat-label>
+    <input matInput formControlName="description"  (change)="''"
+    #textMatter />
+    <mat-error *ngIf="f.description.touched && f.description.hasError('required')">
+      La descripción es obligatoria
+    </mat-error>
+  </mat-form-field>
+
+   <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status" (selectionChange)="''">
+      <mat-option *ngFor="let c of status" [value]="c">{{ c }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="f.status.touched && f.status.hasError('required')">
+      Selecciona un status
+    </mat-error>
+  </mat-form-field>
+
+
+    <mat-dialog-actions align="end" class="sm:col-span-2 lg:col-span-3 p-2">
+    <button mat-stroked-button (click)="close()">Cancelar</button>
+    <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="save()">
+      Guardar
+    </button>
+  </mat-dialog-actions>
+
+
+  </form>
+
+  </mat-card>
+}

@@ -1,0 +1,51 @@
+<div
+  class="panel-backdrop"
+  [class.visible]="opened"
+  (click)="onBackdropClick()"
+  [style.zIndex]="zIndex - 1">
+</div>
+
+<div
+  class="panel-container"
+  [ngClass]="{
+    open: opened,
+    fullscreen: fullscreen()
+  }"
+  [style.zIndex]="zIndex"
+  [style.width]="fullscreen() ? 'calc(90vw - 260px)' : panelWidth() + 'px'"
+  [style.transform]="getTransform()"
+>
+  <!-- handle vertical para redimensionar -->
+  <div
+    class="resize-handle"
+    (mousedown)="onResizeHandleDown($event)"
+    (touchstart)="onResizeHandleDown($event)"
+  ></div>
+
+  <div class="panel-header">
+    <button
+      class="icon-btn"
+      type="button"
+      (click)="toggleFullscreen()"
+      aria-label="Expandir / contraer"
+    >
+      <span *ngIf="!fullscreen()">⤢</span>
+      <span *ngIf="fullscreen()">⤡</span>
+    </button>
+
+    <div class="panel-title">{{ title }}</div>
+
+    <button
+      class="icon-btn"
+      type="button"
+      (click)="close()"
+      aria-label="Cerrar"
+    >
+      ✕
+    </button>
+  </div>
+
+  <div class="panel-content">
+    <ng-content></ng-content>
+  </div>
+</div>

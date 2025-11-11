@@ -1,9 +1,6 @@
 
 
-
-<section class="flex flex-row gap-2 mt-2">
-
-   <mat-form-field appearance="outline" style="width: 320px;">
+<mat-form-field appearance="outline" class="w-56 max-w-md">
     <mat-label>Buscar</mat-label>
  <input matInput
         class="input input-bordered mr-2 w-56"
@@ -11,13 +8,6 @@
           (keyup.enter)="searchInput.emit(txtSearch.value)"
           #txtSearch
         >
+</mat-form-field>
 
-   </mat-form-field>
-
-<button mat-flat-button  (click)="searchInput.emit(txtSearch.value)">
-    <mat-icon>search</mat-icon>&nbsp;Buscar
-  </button>
-
-
-</section>
 

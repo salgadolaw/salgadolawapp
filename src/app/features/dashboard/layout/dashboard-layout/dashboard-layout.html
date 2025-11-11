@@ -1,6 +1,6 @@
 <mat-sidenav-container class="h-screen">
   <mat-sidenav mode="side" [opened]="sidebarOpen()" class="w-64 autoslider">
-    <div class="px-4 py-4 text-lg font-semibold">Mi App</div>
+    <div class="px-4 py-4 text-lg font-semibold">{{ titleApp() }}</div>
     <mat-nav-list>
       @for (item of menuItems(); track trackByPath($index, item)) {
 

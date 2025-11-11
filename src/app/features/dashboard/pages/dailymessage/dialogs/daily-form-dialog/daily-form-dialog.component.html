@@ -1,7 +1,188 @@
-<h2 mat-dialog-title>Delete all elements?</h2>
-<mat-dialog-content>Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos Borrar elementos</mat-dialog-content>
-<mat-dialog-actions>
-  <button matButton mat-dialog-close>Cancel</button>
-  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-  <button matButton [mat-dialog-close]="true">Delete</button>
-</mat-dialog-actions>
+
+<mat-expansion-panel [expanded]="showForm" style="background-color: white;">
+  <mat-expansion-panel-header>
+  <div><h2 mat-dialog-title>
+  @if(idRegist === 0 || idRegist === -1){
+    Nuevo Daily
+  }@else {
+    Actualizar Daily
+  }
+  </h2></div>
+  </mat-expansion-panel-header>
+<!--
+<mat-toolbar color="primary">
+
+  <span class="spacer"></span>
+  <div class="tb-right-grid">
+     @if (showButtonAdd()) {
+  <button type="button" matTooltip="Adicionar Matter" matTooltipPosition="left" (click)="newClioDialogs(textPhone.value)"  class="inline-flex justify-center
+         w-10 h-10 p-0 rounded-full justify-self-center self-center
+           text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white
+           focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium
+           rounded-full text-sm p-2.5 dark:border-blue-500 dark:text-blue-500
+           dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><polyline points="10.25 2.75 2.75 2.75 2.75 13.25 13.25 13.25 13.25 9.75"/><polyline points="5.75 7.75 8.25 10.25 14.25 3.75"/></g></svg>
+    <span class="sr-only">Icon description</span>
+  </button>
+     }
+</div>
+
+</mat-toolbar>
+-->
+
+
+
+
+<app-loading [loading]="loading()"/>
+
+
+
+
+<form [formGroup]="form" class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+
+  <!-- Teléfono -->
+  <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Teléfono</mat-label>
+    <input matInput cdkFocusInitial formControlName="phone"  (change)="changePhone(textPhone.value)"
+    #textPhone />
+    <mat-error *ngIf="f.phone.touched && f.phone.hasError('required')">
+      Teléfono es obligatorio
+    </mat-error>
+    @if( f.phone.hasError('maxlength') && (f.phone.dirty || f.phone.touched)){
+      <mat-error>
+        Máximo 10 digitos
+      </mat-error>
+    }
+  </mat-form-field>
+
+<!--Cargamos los contactos que tiene el número celular se genera un nuevo flujo para este proceso-->
+
+<mat-form-field appearance="outline" class="p-2">
+  <mat-label>Contactos</mat-label>
+  <mat-select formControlName="contact" (selectionChange)="changeContact($event.value)">
+    <mat-option>Seleccione</mat-option>
+    <mat-option *ngFor="let c of contact" [value]="c.id.toString()">{{ c.name }}</mat-option>
+  </mat-select>
+  <mat-error *ngIf="f.contact.touched && f.contact.hasError('required')">
+    Selecciona un contacto
+  </mat-error>
+</mat-form-field>
+
+
+
+
+  <!-- Caller -->
+
+  <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Matters</mat-label>
+    <mat-select formControlName="caller" (selectionChange)="changeCaller($event)">
+      <mat-option>Seleccione</mat-option>
+      <mat-option *ngFor="let c of callers" [value]="c.id.toString()">{{ c.display_number + ' - ' + c.tag }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="f.caller.touched && f.caller.hasError('required')">
+      Selecciona un caller
+    </mat-error>
+  </mat-form-field>
+
+@if (showButton()) {
+  <button type="button"  (click)="newClioDialogs(textPhone.value)" class="inline-flex justify-center
+         w-10 h-10 p-0 rounded-full justify-self-center self-center
+           text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white
+           focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium
+           rounded-full text-sm p-2.5 dark:border-blue-500 dark:text-blue-500
+           dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><polyline points="10.25 2.75 2.75 2.75 2.75 13.25 13.25 13.25 13.25 9.75"/><polyline points="5.75 7.75 8.25 10.25 14.25 3.75"/></g></svg>
+    <span class="sr-only">Icon description</span>
+  </button>
+}
+  <!-- Paralegal -->
+  <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Paralegal</mat-label>
+
+     <mat-select formControlName="paralegal" >
+       <mat-option>Seleccione</mat-option>
+      <mat-option *ngFor="let k of paralegals" [value]="k.isNumericId ? k.id : k.name">
+        @if(!k.isNumericId)
+        {
+          {{ k.id }}
+        }@else {
+          {{ k.name  }}
+        }
+        </mat-option>
+    </mat-select>
+    <mat-error *ngIf="f.paralegal.touched && f.paralegal.hasError('required')">
+      Paralegal es obligatorio
+    </mat-error>
+  </mat-form-field>
+
+
+
+
+  <!-- Categoría -->
+  <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Categoría</mat-label>
+    <mat-select formControlName="categoria" >
+      <mat-option *ngFor="let k of categorias" [value]="k.pk_idcategoria">{{ k.v_namecategori }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="f.categoria.touched && f.categoria.hasError('required')">
+      Selecciona una categoría
+    </mat-error>
+  </mat-form-field>
+
+
+
+  <!-- Email paralegal -->
+
+    <input type="hidden" formControlName="emailParalegal" />
+
+
+  <!-- Resuelto -->
+  <mat-form-field appearance="outline" class="p-2">
+    <mat-label>Resuelto</mat-label>
+    <mat-select formControlName="resuelto">
+
+     <mat-option [value]="">Seleccione</mat-option>
+
+       <mat-option *ngFor="let c of states" [value]="c.id">{{ c.name }}</mat-option>
+
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Observación (ocupa todo el ancho) -->
+  <mat-form-field appearance="outline" class="sm:col-span-2 lg:col-span-3 p-2">
+    <mat-label>Observación</mat-label>
+    <textarea matInput rows="4" formControlName="observacion"></textarea>
+  </mat-form-field>
+
+
+
+  <mat-dialog-actions align="end" class="sm:col-span-2 lg:col-span-3 p-2">
+    <button mat-stroked-button (click)="close()">Cancelar</button>
+    <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="save()" >
+       @if(idRegist === 0 || idRegist === -1){
+        Guardar
+      }@else {
+       Actualizar
+      }
+      </button>
+
+
+  </mat-dialog-actions>
+</form>
+
+
+</mat-expansion-panel>
+
+
+
+<mat-card style="background-color: white;" class="mt-4 p-2">
+ <mat-card-header>
+  <h2 mat-dialog-title>
+    Lista de Notas Matters
+  </h2>
+</mat-card-header>
+
+<app-daily-listnotes [data]="getListNotesMatters.value()" [query]="query()"></app-daily-listnotes>
+
+</mat-card>

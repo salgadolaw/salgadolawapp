@@ -41,6 +41,8 @@ export class DashboardLayoutComponent {
   private dialog = inject(MatDialog);
   private menu = inject(Menu);
 
+  titleApp = signal('Salgado' );
+
   @ViewChild(MatSidenavContainer) container!: MatSidenavContainer;
   @ViewChild(MatSidenav) sidenav!: MatSidenav;
 
@@ -60,9 +62,10 @@ export class DashboardLayoutComponent {
 
     /*const claims = this.tokens.getClaims();
     const roles = Array.isArray(claims?.roles) ? claims!.roles : [];
-
     this.menu.setRoles(roles);
     this.menu.getMenuObservable().subscribe(items => this.menuItems.set(items));*/
+this.titleApp.set('Saldago Law App');
+
     this.menu.loadFromApi().subscribe(items => {
       this.menuItems.set(items);
       queueMicrotask(() => this.container?.updateContentMargins());

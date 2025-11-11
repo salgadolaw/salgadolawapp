@@ -32,7 +32,7 @@ $theme: mat.define-theme(( color: ( theme-type: light ) ));
 html, body { height: 100%; }
 body { margin: 0; }
 
-/* Custom global styles */
+
 
 
 /* styles.scss (global) */
@@ -44,4 +44,85 @@ body { margin: 0; }
 }
 .dialog-fullscreen .mat-mdc-dialog-container .mdc-dialog__surface {
   border-radius: 10px; /* opcional, sin esquinas redondeadas */
+}
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.snack-success {
+  /* Variables MDC (cuando aplica) */
+  --mdc-snackbar-container-color: #16a34a;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mdc-snackbar-action-color: #ffffff;
+}
+
+/* 2) Refuerzo directo al surface (por si el theme ignora variables) */
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-success
+  .mdc-snackbar__surface {
+  background-color: #16a34a !important;
+  color: #fff !important;
+}
+
+/* 3) (Opcional) Asegurar el color del label y acción */
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-success
+  .mdc-snackbar__label {
+  color: #fff !important;
+}
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-success
+  .mdc-button__label {
+  color: #fff !important;
+}
+
+/* Variantes listas por si las usas */
+.cdk-overlay-container .mat-mdc-snack-bar-container.snack-error {
+  --mdc-snackbar-container-color: #dc2626;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mdc-snackbar-action-color: #ffffff;
+}
+
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-error
+  .mdc-snackbar__surface {
+  background-color: #dc2626 !important;
+  color: #fff !important;
+}
+
+/* 3) (Opcional) Asegurar el color del label y acción */
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-error
+  .mdc-snackbar__label {
+  color: #fff !important;
+}
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-error
+  .mdc-button__label {
+  color: #fff !important;
+}
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.snack-warn {
+  --mdc-snackbar-container-color: #f59e0b;
+  --mdc-snackbar-supporting-text-color: #111827;
+  --mdc-snackbar-action-color: #111827;
+}
+
+  .tb { display: flex; align-items: center; }
+.tb-left { flex: 1 1 auto; }
+
+.tb-right-grid {
+  margin-left: auto;
+  display: grid;
+  grid-template-columns: auto auto;   /* como “col-6 col-6” */
+  grid-auto-rows: auto;               /* “filas” automáticas */
+  gap: 8px 12px;                      /* row-gap / col-gap */
+  align-items: center;
+}
+.tb-right-grid .full { grid-column: 1 / -1; } /* ocupa toda la fila */
+.w-180 { width: 180px; }
+
+/* Responsive: en pantallas pequeñas, una columna */
+@media (max-width: 768px) {
+  .tb-right-grid { grid-template-columns: 1fr; }
 }

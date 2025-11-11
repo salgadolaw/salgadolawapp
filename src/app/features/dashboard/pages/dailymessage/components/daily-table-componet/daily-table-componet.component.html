@@ -1,0 +1,52 @@
+<span class="total">Total: {{ total() }}</span>
+
+   <table mat-table [dataSource]="dataSource" matSort
+       matSortActive="phone"
+       matSortDirection="asc"
+       matSortDisableClear>
+
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Teléfono</th>
+        <td mat-cell *matCellDef="let r">{{ r.phone }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="caller">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Caller</th>
+        <td mat-cell *matCellDef="let r">{{ r.caller }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Categoria">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoria</th>
+        <td mat-cell *matCellDef="let r">{{ r.v_namecategori}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Paralegal">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Paralegal</th>
+        <td mat-cell *matCellDef="let r">
+         {{ r.paralegal }}
+        </td>
+      </ng-container>
+
+       <ng-container matColumnDef="Email Paralegal">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Email Paralegal</th>
+        <td mat-cell *matCellDef="let r">
+         {{ r.mailparalegal }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let r">
+          <button mat-button color="primary" (click)="completProcess(r.pk_iddaily)">Completo</button>
+          <button mat-button color="warn" (click)="editRegist(r.pk_iddaily)">Editar</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [pageSize]="5" [pageSizeOptions]="[5,10,25,50]" showFirstLastButtons></mat-paginator>
+
+
+

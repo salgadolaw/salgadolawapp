@@ -44,7 +44,7 @@ return this.http.post<{ token: string }>(`${this.base}/auth/login`, { email, pas
   }
 
   resetPassword(code: string, password: string): Observable<ResetResult> {
-console.log(this.base)
+
     return this.http.post(
       `${this.base}/auth/reset`,
       { code, password },

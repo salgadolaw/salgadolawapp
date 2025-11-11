@@ -12,11 +12,17 @@ import { MatButtonModule } from '@angular/material/button';
 export class NewDailyComponent {
 
   private dialog = inject(MatDialog);
-  newCreation = output();
+  newCreation = output<string>();
 
     newItemsDialogs() {
-    const ref = this.dialog.open(DailyFormDialogComponent, { width: '700px',  maxWidth: '95vw',maxHeight:'95vh',  data: null });
-    ref.afterClosed().subscribe(ok => ok && this.newCreation.emit());
-  }
+    const ref = this.dialog.open(DailyFormDialogComponent, { width: '700px',  maxWidth: '95vw',maxHeight:'95vh',  data: {idRegist: 0} });
+    ref.afterClosed().subscribe((resp)=>{
+       console.log(resp,'Cierre Dialog')
+        if(resp?.ok) {
+
+          this.newCreation.emit(resp.ok)
+        }
+   })
+    }
 
 }

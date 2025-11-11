@@ -1,8 +1,8 @@
 <div class="toolbar flex items-center justify-between gap-4 mb-3">
-<p></p>
-@if(claims()){
-<p>Usuario: {{ claims()?.roles || claims()?.email || 'sin nombre' }}</p>
-}
+  <p></p>
+  @if(claims()){
+  <p>Usuario: {{ claims()?.roles || claims()?.email || 'sin nombre' }}</p>
+  }
 </div>
 
 
@@ -19,17 +19,32 @@
     <mat-divider></mat-divider>
     <br>
 
+    <mat-toolbar class="!bg-transparent !p-0">
+      <div class="flex-1">
+        <dailyMessage-search-daily placeholder="Buscar por nombre, email, estado..."
+          (searchInput)="deilyResource($event)" />
+      </div>
+      <span class="flex-shrink-0">
+        <button mat-flat-button color="primary" (click)="NewCreationDailyPanel(query())">
+          <mat-icon>add</mat-icon>&nbsp;Nuevo</button>
+       <!-- <app-new-daily (newCreation)="newCreationDaily($event)" />-->
+      </span>
+    </mat-toolbar>
 
-    <dailyMessage-search-daily placeholder="Buscar por nombre, email, estado..."
-(searchInput)="deilyResource($event)" />
+    <!--Aqui va la tabla de la información -->
+    <app-daily-table-componet [data]="loadDailyData.value()" [query]="query()" (queryUpdate)="newCreationDaily($event)" />
 
 
-<app-new-daily/>
+
+    <app-panel-right
+    title="Daily Message"
+    [(opened)]="panelOpen"
+    >
 
 
-<!--Aqui va la tabla de la información -->
-<app-daily-table-componet/>
+<app-daily-form-dialog [idRegist]="idRegistro()" [reloadKey]="reloadKey" ></app-daily-form-dialog>
 
+  </app-panel-right>
 
   </mat-card-content>
 </mat-card>
