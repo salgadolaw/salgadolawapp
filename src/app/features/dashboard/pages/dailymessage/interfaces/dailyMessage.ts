@@ -11,11 +11,11 @@ export interface DailyMessage {
   observation:    string;
   fk_states:      string;
   v_namestate:    string;
-  dateregister:   Date;
+  dateregister:   string;
   fk_iduser:      string;
   email:          string;
   username:       string;
-  IdContact:      string;
+  idcontact:      string;
   contact:        string;
 }
 
@@ -35,7 +35,7 @@ export interface ContactPhone {
   name: string;
 }
 
-export interface MattersPhoneClio {
+export interface MatterPhoneClio {
   id:   number;
   display_number: string;
   maildrop_address: string;

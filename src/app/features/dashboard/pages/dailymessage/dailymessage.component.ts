@@ -26,6 +26,8 @@ import { finalize, Observable, of } from 'rxjs';
 import { MatToolbar } from "@angular/material/toolbar";
 import { PanelRightComponent } from "../../../../shared/components/panel-right/panel-right.component";
 import { DailyFormDialogComponent } from "./dialogs/daily-form-dialog/daily-form-dialog.component";
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { LoadingComponent } from "../../../../shared/components/loading/loading.component";
 
 
 
@@ -37,7 +39,7 @@ import { DailyFormDialogComponent } from "./dialogs/daily-form-dialog/daily-form
   standalone: true,
   imports: [CommonModule, MatCardModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule,
     ReactiveFormsModule, MatButtonModule,
-    SearchDailyComponent, NewDailyComponent, DailyTableComponetComponent, MatToolbar, PanelRightComponent, DailyFormDialogComponent],
+    SearchDailyComponent, DailyTableComponetComponent, MatToolbar, PanelRightComponent, DailyFormDialogComponent, LoadingComponent],
   templateUrl: './dailymessage.component.html',
   styleUrl: './dailymessage.component.scss'
 })
@@ -48,7 +50,7 @@ export default class DailymessageComponent {
 
   claims = computed(() => this.token.getClaims());
   dailyService = inject(DailyServiceService);
-  loading = signal(false);
+  loading_ = signal(false);
   data = signal<DailyMessage[]>([]);
   total = signal(0);
 
@@ -69,9 +71,9 @@ export default class DailymessageComponent {
     params: () => ({ email: this.email() } as const),
     stream: ({ params }) => {
       if (!params.email) return of<DailyMessage[]>([]);
-      this.loading.set(true);
+      this.loading_.set(true);
       return this.dailyService.getDailyMessage(params.email).pipe(
-        finalize(() => this.loading.set(false))
+        finalize(() => this.loading_.set(false))
       );
     },
     defaultValue: [], // <- evita T | undefined
@@ -93,40 +95,46 @@ export default class DailymessageComponent {
   }
 
   NewCreationDailyPanel(query: string) {
+
+   const valueIdregist = Number(query);
     this.panelOpen = true;
-    this.idRegistro.update(value => value = -1);
+    this.idRegistro.update(value => value = valueIdregist > 0 ? valueIdregist : -1);
     this.reloadKey++;
-  }
-
-
-
-
-
-
-
-  /*loadDailyData():Observable<DailyMessage[]> | void {
-  this.loading.set(true);
-const email = this.claims()?.email ?? '';
-if( !email ) {
-
-   return this.dailyService.getDailyMessage(email).subscribe({
-    next: (data) => {
-      this.data.set(data);
-      console.log(data);
-      this.total.set(data.length);
-      this.loading.set(false);
-    },
-    error: (error) => {
-      console.error('Error fetching daily messages', error);
-      this.loading.set(false);
-    }
-   })
+    this.loading_.set(false);
 
   }
-}*/
+
+   completeProcessDaily(query: string) {
+
+    this.loading_.set(true);
+     const ref = this.dialog.open(ConfirmDialogComponent, {
+          width: '360px',
+          data: { title: 'Completar Registro', message: `¿Está seguro de completar el registro?` }
+        });
+        ref.afterClosed().subscribe(ok => {
+
+          if (!ok) return;
+    //consumimos el servicio para completar el proceso
+          this.dailyService.completeProcessDaily(Number(query)).pipe(
+            finalize(() => this.loading_.set(false))
+          ).subscribe(
+            () => {
+               this.panelOpen = false;
+              this.loadDailyData.reload();
+            }
+          );
+
+        });
+
+   }
 
 
 
+onDailySaved() {
+  this.loadDailyData.reload();
+  //ocultamos el panel una vez el hijo emita el evento de guardado
+  this.panelOpen = false;
+}
 
 
 

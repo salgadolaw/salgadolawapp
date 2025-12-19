@@ -29,8 +29,12 @@
       (click)="toggleFullscreen()"
       aria-label="Expandir / contraer"
     >
-      <span *ngIf="!fullscreen()">⤢</span>
-      <span *ngIf="fullscreen()">⤡</span>
+    @if (!fullscreen()) {
+      <span >⤢</span>
+    }
+    @if (fullscreen()) {
+      <span >⤡</span>
+    }
     </button>
 
     <div class="panel-title">{{ title }}</div>

@@ -11,7 +11,7 @@ import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { DailyServiceService } from '../../services/dailyService.service';
-import { Categories, ContactPhone, DailyMessage, MattersPhoneClio, PhoneContact } from '../../interfaces/dailyMessage';
+import { Categories, ContactPhone, DailyMessage, MatterPhoneClio, MattersPhoneClio, PhoneContact, Paralegal } from '../../interfaces/dailyMessage';
 import { finalize, map, of, single, switchMap, take, tap } from 'rxjs';
 import { ClioNewClientMatterComponent } from '../clio-newClientMatter/clio-newClientMatter.component';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -43,12 +43,12 @@ type DialogData = {
   imports: [ReactiveFormsModule, CommonModule, MatPaginatorModule, MatSortModule,
     MatIconModule, MatButtonModule,
     MatFormFieldModule, MatInputModule,
-    MatDialogModule, MatSnackBarModule, MatSelectModule, MatProgressSpinnerModule, LoadingComponent, MatToolbar, MatTooltipModule,
+    MatDialogModule, MatSnackBarModule, MatSelectModule, MatProgressSpinnerModule, LoadingComponent, MatTooltipModule,
     MatExpansionModule, MatCard, MatCardHeader, DailyListnotesComponent],
   templateUrl: './daily-form-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DailyFormDialogComponent implements OnInit, OnChanges {
+export class DailyFormDialogComponent implements OnInit, OnChanges   {
 
 
   private fb = inject(FormBuilder);
@@ -84,9 +84,9 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
 
   showButton = signal(false);
   showButtonAdd = signal(false);
-
+  loadUpdate = signal(false);
   contact: ContactPhone[] = [];
-  callers: MattersPhoneClio[] = [];
+  callers: MatterPhoneClio[] = [];
   categorias: Categories[] = [];
   paralegals: ParalegalMatter[] = [];
   newCreation = signal('');
@@ -94,6 +94,8 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   tokenN8n = signal<string>('');
   idMatter = signal<string>('');
   query = signal('');
+  paralegalUpdate = signal<string>('');
+  validHideTable = signal(false);
   states = [
     { 'id': 'Pendiente', 'name': 'Pendiente' },
     { 'id': 'Resuelto', 'name': 'Resuelto' }
@@ -102,7 +104,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   maxLeng = 10;
 
   form = this.fb.group({
-    phone: this.fb.control('', { validators: [Validators.required, Validators.maxLength(this.maxLeng)] }),
+    phone: this.fb.control('', { validators: [Validators.required, Validators.pattern(/^\d{10}$/)] }),
     caller: [''],
     categoria: ['', Validators.required],
     paralegal: [''],
@@ -121,6 +123,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
     this.loadCategories();
     this.getDataIdDaily();
     this.resetFormForNew();
+    this.loading.set(false);
 
 
   }
@@ -128,7 +131,14 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
 
     if ('reloadKey' in changes) {
-      this.resetFormForNew();
+      const id_registro = this.currentId;
+      if (id_registro === -1) {
+        this.resetFormForNew();
+        return;
+      }
+      this.loadCategories();
+      this.getDataIdDaily();
+
     }
   }
 
@@ -136,6 +146,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
 
   private resetFormForNew(): void {
     const id_registro = this.currentId;
+
     if (id_registro === -1) {
 
       this.form.reset();
@@ -149,7 +160,11 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
 
   }
 
+
+
+
   private get currentId(): number {
+
     if (this.dialogData?.idRegist != null) return this.dialogData.idRegist;
     if (this.idRegist != null) return this.idRegist;
     return 0;
@@ -163,29 +178,47 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   getDataIdDaily() {
     this.loading.set(true);
     const id_registro = this.currentId;
+
     if (id_registro < 0) return;
 
     //cargamos la información que se va actualizar
     this.dailyServices.getDailyUpdate(id_registro)
       .subscribe({
         next: (data_) => {
-          this.loading.set(false);
+
           if (Array.isArray(data_) && data_.length === 0) return;
           this.form.patchValue(Array.isArray(data_) ? data_[0] : data_);
           const item = Array.isArray(data_) ? data_[0] : data_;
 
-          const clio: string | undefined = item?.IdContact;
-          //this.callers = [{ id: Number(clio), display_number: item?.caller }];
 
-          const match = this.callers.find(c => c.name === item?.caller);
-          if (match) {
+          if (id_registro > 0) {
+            this.loadUpdate.set(true);
+            this.loadContacts(item?.phone);
 
-            this.form.get('caller')!.setValue(match.id.toString());
-            this.form.get('emailParalegal')!.setValue(item?.mailparalegal);
-            this.form.get('categoria')!.setValue(item?.fk_idcategoria);
-            this.form.get('resuelto')!.setValue(item?.v_namestate);
-            this.form.get('observacion')!.setValue(item?.observation);
+            const rawId = item?.idcontact;
+            const trimmedId = rawId.trim();
+
+            this.form.get('contact')!.setValue(trimmedId);
+
+            const selectedCallerId = (item.clio ?? '').trim();
+
+            //actualizamos el paralegal con los valores de carga
+            this.paralegalUpdate.set(item.paralegal ?? '');
+            this.loadCallers(trimmedId, selectedCallerId);
           }
+
+          const match = this.callers.find(c => c.display_number === item?.caller);
+
+
+          // this.form.get('caller')!.setValue(match?.id.toString());
+          this.form.get('emailParalegal')!.setValue(item?.fk_idcategoria);
+          this.form.get('paralegal')!.setValue(item?.paralegal);
+          this.form.get('categoria')!.setValue(item?.fk_idcategoria);
+          this.form.get('resuelto')!.setValue(item?.v_namestate);
+          this.form.get('observacion')!.setValue(item?.observation);
+            if(this.loadUpdate()){
+              this.loading.set(false);
+            }
           // this.changeCaller(clio);
         },
         error: (err) => {
@@ -215,7 +248,10 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
 
   private buildBody(id?: number): DailyMessage {
     const callerId = this.form.get('caller')?.value;
-    const callerName = this.callers.find(c => c.display_number === callerId)?.name;
+    const callerName_ = this.callers.find(c => c.id.toString() === callerId)?.display_number;
+    const callerTag = this.callers.find(c => c.id.toString() === callerId)?.tag;
+    const callerName = callerName_ + ' ' + callerTag;
+
     const stateId = this.form.controls.resuelto.value;
     const nameState = this.states.find(x => x.id === stateId)?.name ?? '';
     const contactId = this.form.get('contact')?.value;
@@ -232,13 +268,13 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
       observation: this.form.get('observacion')?.value ?? '',
       v_namecategori: '',
       pk_iddaily: id ? id.toString() : '',
-      dateregister: new Date(),
+      dateregister: new Date().toISOString(),
       email: this.claims()?.email ?? '',
       fk_iduser: '',
       fk_states: '',
       username: '',
-      IdContact: contactId?.toString() ?? '',
-      contact: contactName
+      idcontact: contactId?.toString().trim() ?? '',
+      contact: contactName.trim() ?? '',
     };
   }
 
@@ -267,7 +303,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
         } else {
           this.snack.open('Registros actualizados correctamente', 'OK', { duration: 3000, verticalPosition: 'bottom', horizontalPosition: 'center', panelClass: ['snack-success'] });
         }
-
+        this.saved.emit();
         this.loading.set(false);
         this.close();
       },
@@ -302,12 +338,14 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
 
   loadContacts(phone: string) {
 
-    console.log(phone)
+
     this.loading.set(true);
     this.showButton.set(false);
     this.dailyServices.getDailyContacts(phone).subscribe({
       next: (data) => {
+        if(!this.loadUpdate()){
         this.loading.set(false);
+        }
         // si viene como { result: [...] }
         if (Array.isArray((data as any).result)) {
           this.contact = (data as any).result;
@@ -332,18 +370,18 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
     });
   }
 
-  loadCallers(idClient: string) {
+  loadCallers(idClient: string, selectedId?: string | number) {
     const lengthValue = idClient.length;
-
-    this.setMax(lengthValue);
+  const maxLengthValue = Number(this.form.get('phone')?.value?.length);
+    this.setMax(maxLengthValue);
 
     this.loading.set(true);
     this.showButton.set(false);
     this.dailyServices.getDailyCallers(idClient).subscribe({
       next: (data) => {
-
+         console.log(data);
         //this.loading.set(false);
-        if (data.length > 0) {
+        if (data == null) {
           this.showButtonAdd.set(true);
         }
 
@@ -358,7 +396,17 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
           this.callers = [];
         }
 
+        if (selectedId != null) {
+           const idStr = selectedId.toString();
+            const match = this.callers.find(c => c.id?.toString() === idStr);
+          if (match) {
+            this.form.get('caller')?.setValue(match.id.toString());
+            this.applyChangeCaller(match.id.toString());
+          }
+        }
+        if(!this.loadUpdate()){
         this.loading.set(false);
+        }
 
       },
       error: (err) => {
@@ -389,7 +437,11 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   }
 
 
-  changeCaller(event: MatSelectChange) {
+changeCaller(event: MatSelectChange) {
+  this.applyChangeCaller(event);
+}
+
+ private applyChangeCaller(event: any) {
     this.loading.set(true);
 
     const value = typeof event === 'string' ? event : event.value;
@@ -418,6 +470,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
         // buscamos el objeto que trae mailDrop (como tu ejemplo)
         const mailDropItem = this.paralegals.find(p => !!p.mailDrop);
         const mailDrop = mailDropItem?.mailDrop ?? '';
+        this.validHideTable.set(true);
 
         // set al hidden
         this.form.get('emailParalegal')?.setValue(mailDrop.toString());
@@ -431,6 +484,15 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
           //ejecutar las notas que estan asociadas al matter
           this.idMatter.set(String(value));
           //this.getListNotesMatters.reload();
+        }
+
+        if( this.paralegalUpdate() !== ''){
+          const idStr = this.paralegalUpdate().toString();
+
+            const match = this.paralegals.find(c => c.id?.toString() === idStr);
+           if(match){
+              this.form.get('paralegal')?.setValue(match.id.toString());
+           }
         }
 
 
@@ -473,7 +535,7 @@ export class DailyFormDialogComponent implements OnInit, OnChanges {
   }
 
   setMax(len: number) {
-
+  console.log('setMax called with len:', len);
     this.maxLeng = len;
 
     const c = this.form.get('phone');

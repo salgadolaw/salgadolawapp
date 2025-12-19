@@ -7,7 +7,7 @@
 
 
 
-
+<app-loading [loading]="loading_()"/>
 <!--Incluimos la información que se va a visualizar -->
 <mat-card class="welcome-card">
   <mat-card-header>
@@ -27,24 +27,28 @@
       <span class="flex-shrink-0">
         <button mat-flat-button color="primary" (click)="NewCreationDailyPanel(query())">
           <mat-icon>add</mat-icon>&nbsp;Nuevo</button>
-       <!-- <app-new-daily (newCreation)="newCreationDaily($event)" />-->
+        <!-- <app-new-daily (newCreation)="newCreationDaily($event)" />-->
       </span>
     </mat-toolbar>
 
     <!--Aqui va la tabla de la información -->
-    <app-daily-table-componet [data]="loadDailyData.value()" [query]="query()" (queryUpdate)="newCreationDaily($event)" />
+    <app-daily-table-componet
+    [data]="loadDailyData.value()"
+    [query]="query()"
+    (queryUpdate)="NewCreationDailyPanel($event)"
+    (queryFinishProceess)="completeProcessDaily($event)"/>
 
 
 
-    <app-panel-right
-    title="Daily Message"
-    [(opened)]="panelOpen"
-    >
+    <app-panel-right title="Daily Message" [(opened)]="panelOpen">
 
 
-<app-daily-form-dialog [idRegist]="idRegistro()" [reloadKey]="reloadKey" ></app-daily-form-dialog>
+      <app-daily-form-dialog
+      [idRegist]="idRegistro()"
+      [reloadKey]="reloadKey"
+      (saved)="onDailySaved()"></app-daily-form-dialog>
 
-  </app-panel-right>
+    </app-panel-right>
 
   </mat-card-content>
 </mat-card>

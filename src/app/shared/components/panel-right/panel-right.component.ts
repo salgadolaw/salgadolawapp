@@ -3,7 +3,7 @@ import { Component, effect, EventEmitter, HostListener, Input, input, Output, si
 
 @Component({
   selector: 'app-panel-right',
-  imports: [NgIf, NgClass],
+  imports: [ NgClass],
   templateUrl: './panel-right.component.html',
   styleUrls: ['./panel-right.component.scss'],
 

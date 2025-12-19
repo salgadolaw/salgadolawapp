@@ -51,6 +51,7 @@ export class DailyTableComponetComponent {
   filterCtrl = new FormControl('', { nonNullable: true });
   query = input.required<string>();
   queryUpdate = output<string>();
+  queryFinishProceess = output<string>();
 
 
   @ViewChild(MatTable) table!: MatTable<DailyMessage>;
@@ -96,16 +97,18 @@ export class DailyTableComponetComponent {
 
 
   editRegist(idRegist: number) {
-    const ref = this.dialog.open(DailyFormDialogComponent, { width: '700px', maxWidth: '95vw', maxHeight: '95vh', data: { idRegist: idRegist } });
+
+    this.queryUpdate.emit(idRegist.toString());
+    /*const ref = this.dialog.open(DailyFormDialogComponent, { width: '700px', maxWidth: '95vw', maxHeight: '95vh', data: { idRegist: idRegist } });
     ref.afterClosed().subscribe((resp) => {
       if (resp?.ok) {
         this.queryUpdate.emit(resp?.ok);
       }
-    });
+    });*/
   }
 
   completProcess(idresgist: number) {
-    console.log(idresgist)
+    this.queryFinishProceess.emit(idresgist.toString());
   }
 
 

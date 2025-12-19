@@ -16,7 +16,7 @@ export class DailyServiceService {
   constructor() { }
   private http = inject(HttpClient);
   private base = environment.apiBaseUrl.replace(/\/+$/, ''); // Remove trailing slashes
-  private urlClio= environment.urlClio;
+  private urlClio = environment.urlClio;
   private paralegalbase = environment.paralegalSearchApi;
 
   private listCacheDailyMessage = new Map<string, DailyMessage[]>();
@@ -28,31 +28,28 @@ export class DailyServiceService {
     return this.http.get<TokenN8N>(url)
   }
 
- //metodo para el cargue de la información de los dailys
+  //metodo para el cargue de la información de los dailys
   getDailyMessage(email: string) {
     const url = `${this.base}/list/dailys`;
 
-   /*if( this.listCacheDailyMessage.has(email)){
-    return of(this.listCacheDailyMessage.get(email) ?? []);
-   }*/
 
     return this.http.get<DailyMessage[]>(url, { params: { email } })
-    .pipe(
-      map(resp => resp),
-     // tap((listDailys) => this.listCacheDailyMessage.set(email, listDailys))
-    );
+      .pipe(
+        map(resp => resp),
+        // tap((listDailys) => this.listCacheDailyMessage.set(email, listDailys))
+      );
 
   }
 
-getDailyNotesMatter(idMatter: string): Observable<NotesResponse>{
+  getDailyNotesMatter(idMatter: string): Observable<NotesResponse> {
     const url = `${this.base}/list/NotesMatters`;
     const urlClio = environment.urlClio;
     const params = new HttpParams()
-    .set('idMatter', idMatter)
-    .set('urlConsul', urlClio);
+      .set('idMatter', idMatter)
+      .set('urlConsul', urlClio);
     return this.http.get<NotesResponse>(url, { params });
 
-}
+  }
 
 
   //cargar registro a ser editado solo carga
@@ -69,7 +66,7 @@ getDailyNotesMatter(idMatter: string): Observable<NotesResponse>{
     return this.http.get<Categories[]>(url);
   }
 
-getDailyContacts(phone: string) {
+  getDailyContacts(phone: string) {
     const url = `${this.base}/contact/phone`;
     return this.http.get<ContactPhone[]>(url, { params: { phone } })
 
@@ -81,7 +78,7 @@ getDailyContacts(phone: string) {
 
     const params = new HttpParams()
       .set('numClient', contactId)
-      .set('urlAccessCli',this.urlClio);
+      .set('urlAccessCli', this.urlClio);
 
     return this.http.get<MattersPhoneClio[]>(url, { params })
       .pipe(
@@ -110,20 +107,19 @@ getDailyContacts(phone: string) {
   postRegisterDaily(deploy: object) {
     const url = `${this.base}/daily/register`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
     return this.http.post<string>(url, { body: { deploy } }, { headers });
   }
 
 
 
 
- getvalidationMatterClient(phone: string){
-//consultamos y validamos desde el Webhook
+  getvalidationMatterClient(phone: string) {
+    //consultamos y validamos desde el Webhook
 
-const urlClio = this.urlClio;
-const url = `${this.base}/contact/validationMatter`;
-//debemos cargar los datos requeridos para consumir el webhook
-const fields = [
+    const urlClio = this.urlClio;
+    const url = `${this.base}/contact/validationMatter`;
+    //debemos cargar los datos requeridos para consumir el webhook
+    const fields = [
       'id',
       'number',
       'custom_field_values{id,value}',
@@ -142,40 +138,52 @@ const fields = [
       'status',
       'relationships{id,etag,description}',
     ].join(',');
- const params = new HttpParams()
- .set('fields', fields)
- .set('phoneCliente',phone)
- .set('url',urlClio);
+    const params = new HttpParams()
+      .set('fields', fields)
+      .set('phoneCliente', phone)
+      .set('url', urlClio);
 
- return this.http.get<DetailsContact>(url,{ params });
+    return this.http.get<DetailsContact>(url, { params });
 
- }
+  }
 
 
- CreateContactClio(data: object){
-   const urlClio = this.urlClio;
-   const url = `${this.base}/contact/postContact`;
-   const params= new HttpParams()
-   .set('urlClio',urlClio);
+  CreateContactClio(data: object) {
+    const urlClio = this.urlClio;
+    const url = `${this.base}/contact/postContact`;
+    const params = new HttpParams()
+      .set('urlClio', urlClio);
 
-   return this.http.post<ClientCreate>(url,{ data }, {params }).pipe(
-    map(r=>r)
-   );
- }
+    return this.http.post<ClientCreate>(url, { data }, { params }).pipe(
+      map(r => r)
+    );
+  }
 
- //creamos el Matter de acuerdo al IdCliente
+  //creamos el Matter de acuerdo al IdCliente
 
- CreateMatterIdClientClio(data: object){
- const urlClio = this.urlClio;
- const url = `${this.base}/contact/matterAssociate`;
- const params= new HttpParams()
-   .set('urlClio',urlClio);
+  CreateMatterIdClientClio(data: object) {
+    const urlClio = this.urlClio;
+    const url = `${this.base}/contact/matterAssociate`;
+    const params = new HttpParams()
+      .set('urlClio', urlClio);
 
- return this.http.post<MatterCreate>(url,{ data }, { params }).pipe(
-    map(r=>r)
-   );
+    return this.http.post<MatterCreate>(url, { data }, { params }).pipe(
+      map(r => r)
+    );
 
- }
+  }
+
+  completeProcessDaily(idRegist: number) {
+
+
+    const url = `${this.base}/daily/complete`;
+     const urlClio = this.urlClio;
+    const headers = new HttpHeaders()
+    .set('idDaily', `${idRegist}`)
+    .set('urlClio', urlClio);
+    return this.http.get<string>(url, { headers });
+  }
+
 
 
 }

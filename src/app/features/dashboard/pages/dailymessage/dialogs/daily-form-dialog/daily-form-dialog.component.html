@@ -102,13 +102,8 @@
 
      <mat-select formControlName="paralegal" >
        <mat-option>Seleccione</mat-option>
-      <mat-option *ngFor="let k of paralegals" [value]="k.isNumericId ? k.id : k.name">
-        @if(!k.isNumericId)
-        {
-          {{ k.id }}
-        }@else {
-          {{ k.name  }}
-        }
+      <mat-option *ngFor="let k of paralegals" [value]="k.id.toString()">
+        {{ k.name }}
         </mat-option>
     </mat-select>
     <mat-error *ngIf="f.paralegal.touched && f.paralegal.hasError('required')">
@@ -175,7 +170,7 @@
 </mat-expansion-panel>
 
 
-
+@if (validHideTable()) {
 <mat-card style="background-color: white;" class="mt-4 p-2">
  <mat-card-header>
   <h2 mat-dialog-title>
@@ -184,5 +179,5 @@
 </mat-card-header>
 
 <app-daily-listnotes [data]="getListNotesMatters.value()" [query]="query()"></app-daily-listnotes>
-
 </mat-card>
+}
